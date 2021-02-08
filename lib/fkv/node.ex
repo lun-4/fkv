@@ -40,12 +40,14 @@ defmodule Fkv.Node do
   @impl true
   def handle_call({:put, key, value}, _from, state) do
     # broadcast change to all nodes
-    Registry.dispatch(Fkv.Registry, "secondary", fn entries ->
-      Enum.each(entries, fn datum ->
-        {pid, _} = datum
-        Fkv.Node.put(pid, key, value)
+    if state.is_primary do
+      Registry.dispatch(Fkv.Registry, "secondary", fn entries ->
+        Enum.each(entries, fn datum ->
+          {pid, _} = datum
+          Fkv.Node.put(pid, key, value)
+        end)
       end)
-    end)
+    end
 
     {:reply, :ok, %{state | map: Map.put(state.map, key, value)}}
   end
