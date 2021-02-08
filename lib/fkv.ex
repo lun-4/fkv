@@ -1,18 +1,12 @@
 defmodule Fkv do
-  @moduledoc """
-  Documentation for `Fkv`.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  @impl true
+  def start(_type, _args) do
+    children = [
+      {Fkv.Primary, name: Fkv.Primary}
+    ]
 
-  ## Examples
-
-      iex> Fkv.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
