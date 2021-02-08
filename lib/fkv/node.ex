@@ -1,8 +1,8 @@
 defmodule Fkv.Node do
   use GenServer
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts)
+  def start_link(opts, genserver_opts \\ []) do
+    GenServer.start_link(__MODULE__, opts, genserver_opts)
   end
 
   def get(pid, key) do
