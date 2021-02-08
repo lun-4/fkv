@@ -12,5 +12,9 @@ defmodule Fkv.ManyNodeTest do
     assert Fkv.Node.put(primary, "sex", "penis") == :ok
     Process.sleep(1000)
     assert Fkv.Node.get(secondary, "sex") == "penis"
+    assert Fkv.Node.delete(secondary, "sex") != :ok
+    assert Fkv.Node.delete(primary, "sex") == :ok
+    assert Fkv.Node.get(secondary, "sex") == nil
+    assert Fkv.Node.get(primary, "sex") == nil
   end
 end

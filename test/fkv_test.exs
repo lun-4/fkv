@@ -10,5 +10,7 @@ defmodule Fkv.NodeTest do
     assert Fkv.Node.get(node, "sex") == nil
     assert Fkv.Node.put(node, "sex", "penis") == :ok
     assert Fkv.Node.get(node, "sex") == "penis"
+    assert Fkv.Node.delete(node, "sex") == :ok
+    assert Fkv.Node.get(node, "sex") == nil
   end
 end
