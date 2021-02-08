@@ -6,15 +6,19 @@ defmodule Fkv do
     children = [
       %{
         id: Fkv.Registry,
-        start: {Registry, :start_link, [[keys: :duplicate, name: Fkv.Registry]]}
+        start: {Registry, :start_link, [[keys: :duplicate, name: Fkv.GlobalRegistry]]}
       },
       %{
         id: Fkv.Primary,
-        start: {Fkv.Node, :start_link, [[primary: true], [name: Fkv.Primary]]}
+        start:
+          {Fkv.Node, :start_link,
+           [[primary: true, registry: Fkv.GlobalRegistry], [name: Fkv.Primary]]}
       },
       %{
         id: Fkv.Secondary,
-        start: {Fkv.Node, :start_link, [[primary: false], [name: Fkv.Secondary]]}
+        start:
+          {Fkv.Node, :start_link,
+           [[primary: false, registry: Fkv.GlobalRegistry], [name: Fkv.Secondary]]}
       }
     ]
 
