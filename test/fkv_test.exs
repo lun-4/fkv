@@ -2,7 +2,14 @@ defmodule Fkv.NodeTest do
   use ExUnit.Case, async: true
 
   setup do
-    node = start_supervised!({Fkv.Node, [primary: true]})
+    registry = Fkv.SingleNodeRegistry
+
+    _ =
+      start_supervised!({Registry, [keys: :duplicate, name: registry]},
+        id: Fkv.SingleNodeRegistry
+      )
+
+    node = start_supervised!({Fkv.Node, [primary: true, registry: registry]})
     %{node: node}
   end
 

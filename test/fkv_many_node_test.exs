@@ -2,8 +2,19 @@ defmodule Fkv.ManyNodeTest do
   use ExUnit.Case, async: true
 
   setup do
-    primary = start_supervised!({Fkv.Node, [primary: true]}, id: Fkv.Test.Primary)
-    secondary = start_supervised!({Fkv.Node, [primary: false]}, id: Fkv.Test.Secondary)
+    registry = Fkv.ManyNodeRegistry
+
+    _ =
+      start_supervised!({Registry, [keys: :duplicate, name: registry]},
+        id: Fkv.ManyNodeRegistry
+      )
+
+    primary =
+      start_supervised!({Fkv.Node, [primary: true, registry: registry]}, id: Fkv.Test.Primary)
+
+    secondary =
+      start_supervised!({Fkv.Node, [primary: false, registry: registry]}, id: Fkv.Test.Secondary)
+
     %{primary: primary, secondary: secondary}
   end
 
