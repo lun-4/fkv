@@ -4,7 +4,7 @@ defmodule Fkv do
   @impl true
   def start(_type, _args) do
     children = [
-      {Fkv.Primary, name: Fkv.Primary}
+      {Fkv.Node, name: Fkv.Primary}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one)

@@ -1,8 +1,14 @@
-defmodule FkvTest do
-  use ExUnit.Case
-  doctest Fkv
+defmodule Fkv.NodeTest do
+  use ExUnit.Case, async: true
 
-  test "greets the world" do
-    assert Fkv.hello() == :world
+  setup do
+    node = start_supervised!(Fkv.Node)
+    %{node: node}
+  end
+
+  test "get/set single node", %{node: node} do
+    assert Fkv.Node.get(node, "sex") == nil
+    assert Fkv.Node.put(node, "sex", "penis") == :ok
+    assert Fkv.Node.get(node, "sex") == "penis"
   end
 end
