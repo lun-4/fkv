@@ -4,7 +4,16 @@ defmodule Fkv do
   @impl true
   def start(_type, _args) do
     children = [
-      {Fkv.Node, name: Fkv.Primary}
+      %{
+        id: Fkv.Registry,
+        start: {Registry, :start_link, [[keys: :duplicate, name: Fkv.Registry]]}
+      },
+      %{
+        id: Fkv.Primary,
+        start: {Fkv.Node, :start_link, [[primary: true]]},
+        name: Fkv.Primary
+      }
+      # {Fkv.Node, [primary: false], name: Fkv.Secondary}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one)

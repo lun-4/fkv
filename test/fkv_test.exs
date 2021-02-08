@@ -2,7 +2,7 @@ defmodule Fkv.NodeTest do
   use ExUnit.Case, async: true
 
   setup do
-    node = start_supervised!(Fkv.Node)
+    node = start_supervised!({Fkv.Node, [primary: true]})
     %{node: node}
   end
 

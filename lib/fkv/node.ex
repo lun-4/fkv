@@ -2,7 +2,7 @@ defmodule Fkv.Node do
   use GenServer
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, nil, opts)
+    GenServer.start_link(__MODULE__, opts)
   end
 
   def get(pid, key) do
@@ -16,17 +16,37 @@ defmodule Fkv.Node do
   # -- impl --
 
   @impl true
-  def init(_opts) do
-    {:ok, %{}}
+  def init(opts) do
+    is_primary = Keyword.get(opts, :primary)
+
+    if is_primary do
+      {:ok, _} = Registry.register(Fkv.Registry, "primary", nil)
+    else
+      {:ok, _} = Registry.register(Fkv.Registry, "secondary", nil)
+    end
+
+    {:ok,
+     %{
+       is_primary: is_primary,
+       map: %{}
+     }}
   end
 
   @impl true
   def handle_call({:get, key}, _from, state) do
-    {:reply, Map.get(state, key), state}
+    {:reply, Map.get(state.map, key), state}
   end
 
   @impl true
   def handle_call({:put, key, value}, _from, state) do
-    {:reply, :ok, Map.put(state, key, value)}
+    # broadcast change to all nodes
+    Registry.dispatch(Fkv.Registry, "secondary", fn entries ->
+      Enum.each(entries, fn datum ->
+        {pid, _} = datum
+        Fkv.Node.put(pid, key, value)
+      end)
+    end)
+
+    {:reply, :ok, %{state | map: Map.put(state.map, key, value)}}
   end
 end
